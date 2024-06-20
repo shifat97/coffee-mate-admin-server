@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 app.use(cors());
@@ -23,6 +23,32 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    // Database information
+    const database = client.db("coffeeDB");
+    const products = database.collection("products");
+
+    // API for insert new product
+    app.post("/add-coffee", async (req, res) => {
+      const product = req.body;
+      const result = await products.insertOne(product);
+      res.send(result);
+    });
+
+    // API for get all product
+    app.get("/", async (req, res) => {
+      const cursor = products.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // API for get a single product
+    // app.get("/view-product/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   const product = await products.findOne(query);
+    //   res.send(product);
+    // });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -33,10 +59,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
-app.get("/", (req, res) => {
-  res.send("Server is running");
-});
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
