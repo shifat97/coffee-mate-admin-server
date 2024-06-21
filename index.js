@@ -66,6 +66,14 @@ async function run() {
         },
       };
 
+      // API for delete product
+      app.delete("/view-product/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await products.deleteOne(query);
+        res.send(result);
+      });
+
       const result = await products.updateOne(filter, updateProduct, option);
       res.send(result);
     });
