@@ -49,6 +49,27 @@ async function run() {
       res.send(product);
     });
 
+    // API for update product
+    app.put("/view-product/:id", async (req, res) => {
+      const id = req.params.id;
+      const product = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const option = { upsert: true };
+      const updateProduct = {
+        $set: {
+          name: product.name,
+          chef: product.chef,
+          supplier: product.supplier,
+          taste: product.taste,
+          category: product.category,
+          price: product.price,
+        },
+      };
+
+      const result = await products.updateOne(filter, updateProduct, option);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
